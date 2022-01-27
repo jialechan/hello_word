@@ -1,7 +1,6 @@
 ## 留意你的构建上下文(build命令会将整个上下文的文件发给daemon)
 ```
-# 下面的.就是以当前目录为上下文
-docker build .
+docker build . # 以当前目录为上下文
 ```
 * docker build不是运行在docker cli，而是运行在docker daemon;   
 * build执行的第一件事是将上下文以递归的方式发送给docker daemon;   
@@ -12,20 +11,40 @@ docker build .
 
 ## RUN
 ```shell
-RUN command param1 param2 # shell模式，指令是运行在shell里面，默认是/bin/sh -c
-RUN ["executable", "param1", "param2"] # exec模式
+RUN command param1 param2 # shell形式，指令是运行在shell里面，默认是/bin/sh -c
+RUN ["executable", "param1", "param2"] # exec形式
 ```
-* exec模式没有shell的字符串替换，而且可以在一些没有shell的很基础镜像中执行.  
-* exec模式不运行在shell，所以shell的一些程序就没执行，比如RUN [ "echo", "$HOME" ]，就不会替换$HOME变量
+* exec形式没有shell的字符串替换，而且可以在一些没有shell的很基础镜像中执行.  
+* exec形式不运行在shell，所以shell的一些程序就没执行，比如RUN [ "echo", "$HOME" ]，就不会替换$HOME变量
 
 ## CMD
 ```shell
-CMD ["executable","param1","param2"] # exec模式, 首选模式
+CMD ["executable","param1","param2"] # exec形式, 首选模式
 CMD ["param1","param2"] # 作为ENTRYPOINT的默认参数
-CMD command param1 param2 # shell模式
+CMD command param1 param2 # shell形式
 ```
 * Dockerfile只能存在一条CMD指令，如果有多条的话只有最后一条指令生效；   
 * CMD的主要作用是为容器提供默认的执行命令。这些默认的执行命令可以包含可执行命令，也可以不包含，不过不包含的时候，你必须制定一个ENTRYPOINT指令;  
 * 不要混淆RUN和CMD。RUN本质上是在构建阶段运行一个命令并且commit运行结果; CMD则不会在运行时执行任何命令，而是提供给容器一个预期的命令;   
 
 ## ENTRYPOINT
+```shell
+ENTRYPOINT ["executable", "param1", "param2"] # exec形式
+ENTRYPOINT command param1 param2 # shell形式
+```
+* docker run &lt;image&gt;的命令行参数会传给ENTRYPOINT并覆盖所有的CMD参数;比如docker run &lt;image&gt; -d这里的-d就会传给ENTRYPOINT并覆盖CMD
+* 如果要修改ENTRYPOINT可以用docker run --entrypoint(只能是exec形式)
+* shell形式会阻止任何CMD命令和run(这里指docker run)的命令行参数；但是缺点是shell形式会作为/bin/sh -c子命令来启动，这意味着可执行文件不再是容器的PID 1进程，也就是不能接收到Unix的信号，所以你的可执行程序在docker stop &lt;container&gt;的时候就不会收到SIGTERM，意味着不能让程序“优雅关闭”
+
+## CMD & ENTRYPOINT
+* Dockerfile 应该至少指定一个CMD或ENTRYPOINT命令。
+* ENTRYPOINT应在将容器用作可执行文件时定义。
+* CMD应该用作为ENTRYPOINT命令定义默认参数或在容器中执行临时命令的一种方式。
+* docker run的命令行参数会替代CMD
+
+||No ENTRYPOINT|	ENTRYPOINT exec_entry p1_entry|	ENTRYPOINT [“exec_entry”, “p1_entry”]|
+|  ----  | ----  | ----  | ----  |
+|No CMD	|error, not allowed|	/bin/sh -c exec_entry p1_entry|	exec_entry p1_entry|
+|CMD [“exec_cmd”, “p1_cmd”]|	exec_cmd p1_cmd|	/bin/sh -c exec_entry p1_entry|	exec_entry p1_entry exec_cmd p1_cmd|
+|CMD [“p1_cmd”, “p2_cmd”]	|p1_cmd p2_cmd	|/bin/sh -c exec_entry p1_entry|	exec_entry p1_entry p1_cmd p2_cmd|
+|CMD exec_cmd p1_cmd|	/bin/sh -c exec_cmd p1_cmd	|/bin/sh -c exec_entry p1_entry|	exec_entry p1_entry /bin/sh -c exec_cmd p1_cmd|
