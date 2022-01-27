@@ -60,3 +60,10 @@ EXPOSE <port> [<port>/<protocol>...]
 ENV <key>=<value> ...
 ```  
 * ENV设置的环境变量可以在容器被运行的时候访问到，所以如果只是构建时使用的环境变量，请使用ARG，用ARG设置的环境变量在容器运行的时候是不存在的。
+## ADD & COPY
+```shell
+COPY dist/ /app/dist # 将上下文中的dist文件夹内所有内容，按目录结构，拷贝到/app/dist目录下。千万不要写成COPY dist/* /app/dist
+```
+* 不知道用那个的时候就用COPY
+* 主要区别是COPY的src可以是一个互联网地址
+
