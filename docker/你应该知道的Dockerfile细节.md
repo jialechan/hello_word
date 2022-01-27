@@ -48,3 +48,10 @@ ENTRYPOINT command param1 param2 # shell形式
 |CMD [“exec_cmd”, “p1_cmd”]|	exec_cmd p1_cmd|	/bin/sh -c exec_entry p1_entry|	exec_entry p1_entry exec_cmd p1_cmd|
 |CMD [“p1_cmd”, “p2_cmd”]	|p1_cmd p2_cmd	|/bin/sh -c exec_entry p1_entry|	exec_entry p1_entry p1_cmd p2_cmd|
 |CMD exec_cmd p1_cmd|	/bin/sh -c exec_cmd p1_cmd	|/bin/sh -c exec_entry p1_entry|	exec_entry p1_entry /bin/sh -c exec_cmd p1_cmd|
+
+## EXPOSE
+```shell
+EXPOSE <port> [<port>/<protocol>...]
+```
+* EXPOSE指令并没有真的发布port, 他起的是一个“文档”的作用：作为创建容器的作者“期望”使用者发布的端口
+* 要在运行容器时实际发布端口，请使用docker run -p来发布和映射一个或多个端口，或者使用-P标志来发布所有暴露的端口并将它们映射到高阶端口。
