@@ -64,6 +64,6 @@ ENV <key>=<value> ...
 ```shell
 COPY dist/ /app/dist # 将上下文中的dist文件夹内所有内容，按目录结构，拷贝到/app/dist目录下。千万不要写成COPY dist/* /app/dist
 ```
-* 不知道用那个的时候就用COPY
-* 主要区别是COPY的src可以是一个互联网地址
+* ADD可以src一个互联网地址，也可以解压常见的压缩文件
+* ADD可以有缓存的功能
 
