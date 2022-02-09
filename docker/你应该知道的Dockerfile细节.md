@@ -1,6 +1,7 @@
 ## 留意你的构建上下文(build命令会将整个上下文的文件发给daemon)
-```
-docker build . # 以当前目录为上下文
+```shell
+# 以当前目录为上下文
+docker build . 
 ```
 * docker build不是运行在docker cli，而是运行在docker daemon;   
 * build执行的第一件事是将上下文以递归的方式发送给docker daemon;   
