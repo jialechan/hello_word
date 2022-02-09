@@ -48,7 +48,10 @@ ENTRYPOINT command param1 param2 # shell形式
 |CMD [“exec_cmd”, “p1_cmd”]|	exec_cmd p1_cmd|	/bin/sh -c exec_entry p1_entry|	exec_entry p1_entry exec_cmd p1_cmd|
 |CMD [“p1_cmd”, “p2_cmd”]	|p1_cmd p2_cmd	|/bin/sh -c exec_entry p1_entry|	exec_entry p1_entry p1_cmd p2_cmd|
 |CMD exec_cmd p1_cmd|	/bin/sh -c exec_cmd p1_cmd	|/bin/sh -c exec_entry p1_entry|	exec_entry p1_entry /bin/sh -c exec_cmd p1_cmd|
-
+```shell
+# 命令行替换entrypoint和cmd
+docker run --entrypoint ls --rm 755921704393.dkr.ecr.ap-southeast-1.amazonaws.com/ai-face-process-server:1fd6fc4d284f6a495d1ab616584da92423dfc401 /root/
+```
 ## EXPOSE
 ```shell
 EXPOSE <port> [<port>/<protocol>...]
